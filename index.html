@@ -7,127 +7,153 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="desktop">
-      <div id="desktopArea" class="desktop-area" aria-label="Desktop"></div>
+    <div id="loginScreen" class="login-screen">
+      <div class="login-panel">
+        <div class="login-title">PISCES OS</div>
+        <div class="login-subtitle">Secure Access Portal</div>
 
-      <div class="taskbar" role="toolbar" aria-label="Taskbar">
-        <button class="taskbar-button" data-target="launcher">Apps</button>
-        <button class="taskbar-button" data-target="terminal">Terminal</button>
-        <button class="taskbar-button" data-target="files">Files</button>
-        <button class="taskbar-button" data-target="editor">Editor</button>
-        <button class="taskbar-button" data-target="settings">Settings</button>
-        <div id="systemClock" class="taskbar-clock">00:00</div>
+        <form id="loginForm" class="login-form">
+          <label class="login-label">
+            Username
+            <input id="usernameInput" type="text" value="admin" autocomplete="username" />
+          </label>
+
+          <label class="login-label">
+            Password
+            <input id="passwordInput" type="password" value="admin" autocomplete="current-password" />
+          </label>
+
+          <button class="login-button" type="submit">Login</button>
+        </form>
+
+        <div id="loginError" class="login-error" aria-live="polite"></div>
+        <div class="login-hint">Demo login: admin / admin</div>
       </div>
     </div>
 
-    <div id="launcher" class="window" data-window>
-      <div class="window-header" data-draggable>
-        <div class="window-title">Pisces App Launcher</div>
-        <button class="window-close" data-close="launcher" aria-label="Close launcher">×</button>
-      </div>
-      <div class="window-content">
-        <div class="launcher-grid">
-          <button class="app-card" data-target="terminal">
-            <div class="app-icon">💻</div>
-            <div>Terminal</div>
-          </button>
-          <button class="app-card" data-target="editor">
-            <div class="app-icon">📝</div>
-            <div>Editor</div>
-          </button>
-          <button class="app-card" data-target="files">
-            <div class="app-icon">📁</div>
-            <div>Files</div>
-          </button>
-          <button class="app-card" data-target="settings">
-            <div class="app-icon">⚙️</div>
-            <div>Settings</div>
-          </button>
-          <button class="app-card" data-target="about">
-            <div class="app-icon">🌙</div>
-            <div>About</div>
-          </button>
-          <button class="app-card" data-target="notes">
-            <div class="app-icon">📓</div>
-            <div>Notes</div>
-          </button>
+    <div id="desktopShell" class="desktop-shell">
+      <div class="desktop">
+        <div id="desktopArea" class="desktop-area" aria-label="Desktop"></div>
+
+        <div class="taskbar" role="toolbar" aria-label="Taskbar">
+          <button class="taskbar-button" data-target="launcher">Apps</button>
+          <button class="taskbar-button" data-target="terminal">Terminal</button>
+          <button class="taskbar-button" data-target="files">Files</button>
+          <button class="taskbar-button" data-target="editor">Editor</button>
+          <button class="taskbar-button" data-target="settings">Settings</button>
+          <div id="systemClock" class="taskbar-clock">00:00</div>
         </div>
       </div>
-    </div>
 
-    <div id="terminal" class="window" data-window>
-      <div class="window-header" data-draggable>
-        <div class="window-title">Terminal</div>
-        <button class="window-close" data-close="terminal" aria-label="Close terminal">×</button>
-      </div>
-      <div class="window-content terminal-shell">
-        <div id="terminalOutput" class="terminal-output" aria-live="polite"></div>
-        <div class="terminal-input-row">
-          <span class="prompt">$</span>
-          <input id="terminalInput" type="text" autocomplete="off" spellcheck="false" />
+      <div id="launcher" class="window" data-window>
+        <div class="window-header" data-draggable>
+          <div class="window-title">Pisces App Launcher</div>
+          <button class="window-close" data-close="launcher" aria-label="Close launcher">×</button>
+        </div>
+        <div class="window-content">
+          <div class="launcher-grid">
+            <button class="app-card" data-target="terminal">
+              <div class="app-icon">💻</div>
+              <div>Terminal</div>
+            </button>
+            <button class="app-card" data-target="editor">
+              <div class="app-icon">📝</div>
+              <div>Editor</div>
+            </button>
+            <button class="app-card" data-target="files">
+              <div class="app-icon">📁</div>
+              <div>Files</div>
+            </button>
+            <button class="app-card" data-target="settings">
+              <div class="app-icon">⚙️</div>
+              <div>Settings</div>
+            </button>
+            <button class="app-card" data-target="about">
+              <div class="app-icon">🌙</div>
+              <div>About</div>
+            </button>
+            <button class="app-card" data-target="notes">
+              <div class="app-icon">📓</div>
+              <div>Notes</div>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div id="editor" class="window" data-window>
-      <div class="window-header" data-draggable>
-        <div class="window-title">Text Editor</div>
-        <button class="window-close" data-close="editor" aria-label="Close editor">×</button>
+      <div id="terminal" class="window" data-window>
+        <div class="window-header" data-draggable>
+          <div class="window-title">Terminal</div>
+          <button class="window-close" data-close="terminal" aria-label="Close terminal">×</button>
+        </div>
+        <div class="window-content terminal-shell">
+          <div id="terminalOutput" class="terminal-output" aria-live="polite"></div>
+          <div class="terminal-input-row">
+            <span class="prompt">$</span>
+            <input id="terminalInput" type="text" autocomplete="off" spellcheck="false" />
+          </div>
+        </div>
       </div>
-      <div class="window-content editor-shell">
-        <textarea id="editorArea" class="editor-area" spellcheck="false"># Pisces OS
+
+      <div id="editor" class="window" data-window>
+        <div class="window-header" data-draggable>
+          <div class="window-title">Text Editor</div>
+          <button class="window-close" data-close="editor" aria-label="Close editor">×</button>
+        </div>
+        <div class="window-content editor-shell">
+          <textarea id="editorArea" class="editor-area" spellcheck="false"># Pisces OS
 # Welcome to your system.</textarea>
+        </div>
       </div>
-    </div>
 
-    <div id="files" class="window" data-window>
-      <div class="window-header" data-draggable>
-        <div class="window-title">File Manager</div>
-        <button class="window-close" data-close="files" aria-label="Close files">×</button>
+      <div id="files" class="window" data-window>
+        <div class="window-header" data-draggable>
+          <div class="window-title">File Manager</div>
+          <button class="window-close" data-close="files" aria-label="Close files">×</button>
+        </div>
+        <div class="window-content">
+          <div class="file-list" id="fileList"></div>
+        </div>
       </div>
-      <div class="window-content">
-        <div class="file-list" id="fileList"></div>
-      </div>
-    </div>
 
-    <div id="settings" class="window" data-window>
-      <div class="window-header" data-draggable>
-        <div class="window-title">System Settings</div>
-        <button class="window-close" data-close="settings" aria-label="Close settings">×</button>
+      <div id="settings" class="window" data-window>
+        <div class="window-header" data-draggable>
+          <div class="window-title">System Settings</div>
+          <button class="window-close" data-close="settings" aria-label="Close settings">×</button>
+        </div>
+        <div class="window-content settings-shell">
+          <h3>Pisces OS v1.0</h3>
+          <ul>
+            <li>Kernel: Pisces-1.0</li>
+            <li>Architecture: HTML5 Web Desktop</li>
+            <li>Session: Administrator</li>
+            <li>Mode: Ambient / Studio</li>
+            <li>Uptime: Always Running</li>
+          </ul>
+          <button class="danger-button">Shutdown</button>
+        </div>
       </div>
-      <div class="window-content settings-shell">
-        <h3>Pisces OS v1.0</h3>
-        <ul>
-          <li>Kernel: Pisces-1.0</li>
-          <li>Architecture: HTML5 Web Desktop</li>
-          <li>Session: Administrator</li>
-          <li>Mode: Ambient / Studio</li>
-          <li>Uptime: Always Running</li>
-        </ul>
-        <button class="danger-button">Shutdown</button>
-      </div>
-    </div>
 
-    <div id="about" class="window" data-window>
-      <div class="window-header" data-draggable>
-        <div class="window-title">About Pisces</div>
-        <button class="window-close" data-close="about" aria-label="Close about">×</button>
+      <div id="about" class="window" data-window>
+        <div class="window-header" data-draggable>
+          <div class="window-title">About Pisces</div>
+          <button class="window-close" data-close="about" aria-label="Close about">×</button>
+        </div>
+        <div class="window-content info-shell">
+          <p>Pisces OS is a stylized desktop system built in HTML, CSS, and JavaScript.</p>
+          <p>It is designed as a cyberpunk-inspired environment for experimenting with app layouts, windows, and system UI.</p>
+        </div>
       </div>
-      <div class="window-content info-shell">
-        <p>Pisces OS is a stylized desktop system built in HTML, CSS, and JavaScript.</p>
-        <p>It is designed as a cyberpunk-inspired environment for experimenting with app layouts, windows, and system UI.</p>
-      </div>
-    </div>
 
-    <div id="notes" class="window" data-window>
-      <div class="window-header" data-draggable>
-        <div class="window-title">Notes</div>
-        <button class="window-close" data-close="notes" aria-label="Close notes">×</button>
-      </div>
-      <div class="window-content">
-        <textarea id="notesArea" class="notes-area" spellcheck="false">Keep your own rhythm.
+      <div id="notes" class="window" data-window>
+        <div class="window-header" data-draggable>
+          <div class="window-title">Notes</div>
+          <button class="window-close" data-close="notes" aria-label="Close notes">×</button>
+        </div>
+        <div class="window-content">
+          <textarea id="notesArea" class="notes-area" spellcheck="false">Keep your own rhythm.
 Stay creative.
 Build your system.</textarea>
+        </div>
       </div>
     </div>
 

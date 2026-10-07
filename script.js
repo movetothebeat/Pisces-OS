@@ -15,6 +15,10 @@ const fileSystem = {
 const appWindows = Array.from(document.querySelectorAll('[data-window]'));
 const terminalOutput = document.getElementById('terminalOutput');
 const terminalInput = document.getElementById('terminalInput');
+const loginScreen = document.getElementById('loginScreen');
+const desktopShell = document.getElementById('desktopShell');
+const loginForm = document.getElementById('loginForm');
+const loginError = document.getElementById('loginError');
 let zIndex = 100;
 
 function renderDesktopIcons() {
@@ -190,6 +194,33 @@ function bindTerminal() {
   });
 }
 
+function enableDesktop() {
+  loginScreen.classList.add('hidden');
+  desktopShell.classList.add('logged-in');
+  appWindows.forEach((windowNode) => {
+    windowNode.style.zIndex = '10';
+  });
+  openWindow('launcher');
+  appendTerminalOutput('Pisces OS ready. Type "help" for commands.');
+}
+
+function bindLogin() {
+  loginForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    const username = document.getElementById('usernameInput').value.trim();
+    const password = document.getElementById('passwordInput').value.trim();
+
+    if (username === 'admin' && password === 'admin') {
+      loginError.textContent = '';
+      enableDesktop();
+      return;
+    }
+
+    loginError.textContent = 'Invalid credentials. Try admin / admin.';
+  });
+}
+
 window.addEventListener('load', () => {
   renderDesktopIcons();
   renderFileList();
@@ -197,14 +228,7 @@ window.addEventListener('load', () => {
   bindWindowControls();
   bindWindowDrag();
   bindTerminal();
+  bindLogin();
   updateClock();
   setInterval(updateClock, 1000);
-
-  appWindows.forEach((windowNode) => {
-    windowNode.style.zIndex = '10';
-  });
-
-  openWindow('launcher');
-  appendTerminalOutput('Pisces OS ready. Type "help" for commands.');
 });
-
