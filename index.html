@@ -41,6 +41,7 @@
           <button class="taskbar-button" data-target="files">Files</button>
           <button class="taskbar-button" data-target="editor">Editor</button>
           <button class="taskbar-button" data-target="settings">Settings</button>
+          <button id="signOutButton" class="taskbar-button taskbar-signout">Sign Out</button>
           <div id="systemClock" class="taskbar-clock">00:00</div>
         </div>
       </div>
@@ -129,6 +130,14 @@
             <li>Mode: Ambient / Studio</li>
             <li>Uptime: Always Running</li>
           </ul>
+          <div style="margin-top: 20px;">
+            <p style="color: var(--cyan); font-weight: bold;">Theme</p>
+            <div style="display: flex; gap: 8px;">
+              <button class="theme-btn" data-theme="dark">Dark</button>
+              <button class="theme-btn" data-theme="light">Light</button>
+              <button class="theme-btn" data-theme="neon">Neon</button>
+            </div>
+          </div>
           <button class="danger-button">Shutdown</button>
         </div>
       </div>

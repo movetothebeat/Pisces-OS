@@ -24,8 +24,25 @@ const loginScreen = document.getElementById('loginScreen');
 const desktopShell = document.getElementById('desktopShell');
 const loginForm = document.getElementById('loginForm');
 const loginError = document.getElementById('loginError');
+const signOutButton = document.getElementById('signOutButton');
 let currentUser = null;
 let zIndex = 100;
+
+const THEME_KEY = 'pisces-theme';
+const DEFAULT_THEME = 'dark';
+
+function getTheme() {
+  return localStorage.getItem(THEME_KEY) || DEFAULT_THEME;
+}
+
+function setTheme(theme) {
+  localStorage.setItem(THEME_KEY, theme);
+  const html = document.documentElement;
+  html.classList.remove('theme-dark', 'theme-light', 'theme-neon');
+  if (theme !== 'dark') {
+    html.classList.add(`theme-${theme}`);
+  }
+}
 
 function renderDesktopIcons() {
   const desktopArea = document.getElementById('desktopArea');
@@ -70,6 +87,12 @@ function renderFileList() {
   fileList.innerHTML = entries;
 }
 
+function closeAllWindows() {
+  appWindows.forEach((windowNode) => {
+    windowNode.classList.remove('active');
+  });
+}
+
 function openWindow(id) {
   const target = document.getElementById(id);
   if (!target) return;
@@ -85,6 +108,7 @@ function closeWindow(id) {
 
 function bindTaskbar() {
   document.querySelectorAll('.taskbar-button').forEach((button) => {
+    if (button.id === 'signOutButton') return;
     button.addEventListener('click', () => {
       openWindow(button.dataset.target);
     });
@@ -200,6 +224,27 @@ function bindTerminal() {
   });
 }
 
+function bindThemeButtons() {
+  document.querySelectorAll('.theme-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const theme = e.target.dataset.theme;
+      setTheme(theme);
+      appendTerminalOutput(`Theme changed to: ${theme}`);
+    });
+  });
+}
+
+function signOut() {
+  currentUser = null;
+  closeAllWindows();
+  desktopShell.classList.remove('logged-in');
+  loginScreen.classList.remove('hidden');
+  loginError.textContent = '';
+  document.getElementById('usernameInput').value = 'Max';
+  document.getElementById('passwordInput').value = 'boi';
+  terminalOutput.innerHTML = '';
+}
+
 function enableDesktop(username) {
   currentUser = username;
   loginScreen.classList.add('hidden');
@@ -230,7 +275,14 @@ function bindLogin() {
   });
 }
 
+function bindSignOut() {
+  signOutButton.addEventListener('click', signOut);
+}
+
 window.addEventListener('load', () => {
+  const savedTheme = getTheme();
+  setTheme(savedTheme);
+
   renderDesktopIcons();
   renderFileList();
   bindTaskbar();
@@ -238,6 +290,8 @@ window.addEventListener('load', () => {
   bindWindowDrag();
   bindTerminal();
   bindLogin();
+  bindSignOut();
+  bindThemeButtons();
   updateClock();
   setInterval(updateClock, 1000);
 });
