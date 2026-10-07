@@ -158,7 +158,7 @@ function handleTerminalCommand(command) {
   }
 
   if (value === 'whoami') {
-    appendTerminalOutput('administrator');
+    appendTerminalOutput('Max');
     return;
   }
 
@@ -173,7 +173,7 @@ function handleTerminalCommand(command) {
   }
 
   if (value === 'neofetch') {
-    appendTerminalOutput('Pisces OS v1.0 | HTML5 Desktop | Administrator | Ambient Mode');
+    appendTerminalOutput('Pisces OS v1.0 | HTML5 Desktop | Max | Ambient Mode');
     return;
   }
 
@@ -211,13 +211,13 @@ function bindLogin() {
     const username = document.getElementById('usernameInput').value.trim();
     const password = document.getElementById('passwordInput').value.trim();
 
-    if (username === 'admin' && password === 'admin') {
+    if (username === 'Max' && password === 'boi') {
       loginError.textContent = '';
       enableDesktop();
       return;
     }
 
-    loginError.textContent = 'Invalid credentials. Try admin / admin.';
+    loginError.textContent = 'Invalid credentials. Try Max / boi.';
   });
 }
 
