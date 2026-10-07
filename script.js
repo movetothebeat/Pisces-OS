@@ -12,6 +12,11 @@ const fileSystem = {
   Downloads: ['image.png', 'archive.zip', 'data.csv'],
 };
 
+const users = [
+  { username: 'Max', password: 'boi', displayName: 'Max' },
+  { username: 'monte', password: 'mnttgrsrkn2014!', displayName: 'monte' },
+];
+
 const appWindows = Array.from(document.querySelectorAll('[data-window]'));
 const terminalOutput = document.getElementById('terminalOutput');
 const terminalInput = document.getElementById('terminalInput');
@@ -19,6 +24,7 @@ const loginScreen = document.getElementById('loginScreen');
 const desktopShell = document.getElementById('desktopShell');
 const loginForm = document.getElementById('loginForm');
 const loginError = document.getElementById('loginError');
+let currentUser = null;
 let zIndex = 100;
 
 function renderDesktopIcons() {
@@ -158,7 +164,7 @@ function handleTerminalCommand(command) {
   }
 
   if (value === 'whoami') {
-    appendTerminalOutput('Max');
+    appendTerminalOutput(currentUser);
     return;
   }
 
@@ -173,7 +179,7 @@ function handleTerminalCommand(command) {
   }
 
   if (value === 'neofetch') {
-    appendTerminalOutput('Pisces OS v1.0 | HTML5 Desktop | Max | Ambient Mode');
+    appendTerminalOutput(`Pisces OS v1.0 | HTML5 Desktop | ${currentUser} | Ambient Mode`);
     return;
   }
 
@@ -194,14 +200,15 @@ function bindTerminal() {
   });
 }
 
-function enableDesktop() {
+function enableDesktop(username) {
+  currentUser = username;
   loginScreen.classList.add('hidden');
   desktopShell.classList.add('logged-in');
   appWindows.forEach((windowNode) => {
     windowNode.style.zIndex = '10';
   });
   openWindow('launcher');
-  appendTerminalOutput('Pisces OS ready. Type "help" for commands.');
+  appendTerminalOutput(`Pisces OS ready. Logged in as ${username}. Type "help" for commands.`);
 }
 
 function bindLogin() {
@@ -211,13 +218,15 @@ function bindLogin() {
     const username = document.getElementById('usernameInput').value.trim();
     const password = document.getElementById('passwordInput').value.trim();
 
-    if (username === 'Max' && password === 'boi') {
+    const user = users.find((u) => u.username === username && u.password === password);
+
+    if (user) {
       loginError.textContent = '';
-      enableDesktop();
+      enableDesktop(user.displayName);
       return;
     }
 
-    loginError.textContent = 'Invalid credentials. Try Max / boi.';
+    loginError.textContent = 'Invalid credentials. Check the hint below.';
   });
 }
 
