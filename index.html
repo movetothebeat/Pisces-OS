@@ -27,7 +27,7 @@
         </form>
 
         <div id="loginError" class="login-error" aria-live="polite"></div>
-        <div class="login-hint">Available: Max/boi or monte/mnttgrsrkn2014!</div>
+        <div class="login-hint">Available: Max/boi, monte/mnttgrsrkn2014!, Teddy/teddy123, emin/emin123</div>
       </div>
     </div>
 
@@ -41,6 +41,8 @@
           <button class="taskbar-button" data-target="files">Files</button>
           <button class="taskbar-button" data-target="editor">Editor</button>
           <button class="taskbar-button" data-target="settings">Settings</button>
+          <button class="taskbar-button" data-target="chat">Chat</button>
+          <button class="taskbar-button" data-target="snake">Snake</button>
           <button id="signOutButton" class="taskbar-button taskbar-signout">Sign Out</button>
           <div id="systemClock" class="taskbar-clock">00:00</div>
         </div>
@@ -76,6 +78,14 @@
             <button class="app-card" data-target="notes">
               <div class="app-icon">📓</div>
               <div>Notes</div>
+            </button>
+            <button class="app-card" data-target="chat">
+              <div class="app-icon">💬</div>
+              <div>Chat</div>
+            </button>
+            <button class="app-card" data-target="snake">
+              <div class="app-icon">🐍</div>
+              <div>Snake</div>
             </button>
           </div>
         </div>
@@ -139,6 +149,43 @@
             </div>
           </div>
           <button class="danger-button">Shutdown</button>
+        </div>
+      </div>
+
+      <div id="chat" class="window" data-window>
+        <div class="window-header" data-draggable>
+          <div class="window-title">Chat</div>
+          <button class="window-close" data-close="chat" aria-label="Close chat">×</button>
+        </div>
+        <div class="window-content chat-shell">
+          <div class="chat-sidebar">
+            <div class="chat-user-list-header">Users</div>
+            <div id="chatUserList" class="chat-user-list"></div>
+          </div>
+          <div class="chat-main">
+            <div id="chatMessages" class="chat-messages"></div>
+            <div class="chat-controls">
+              <select id="chatTarget" class="chat-select">
+                <option value="everyone">Everyone</option>
+              </select>
+              <input id="chatInput" type="text" class="chat-input" placeholder="Type a message..." autocomplete="off" />
+              <button id="chatSend" class="chat-send">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="snake" class="window" data-window>
+        <div class="window-header" data-draggable>
+          <div class="window-title">Snake</div>
+          <button class="window-close" data-close="snake" aria-label="Close snake">×</button>
+        </div>
+        <div class="window-content snake-shell">
+          <div class="snake-header">
+            <div>Score: <span id="snakeScore">0</span></div>
+            <button id="snakeRestart" class="snake-restart">Restart</button>
+          </div>
+          <canvas id="snakeCanvas" width="360" height="360" aria-label="Snake game"></canvas>
         </div>
       </div>
 

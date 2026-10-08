@@ -4,6 +4,8 @@ const icons = [
   { label: 'Files', icon: '📁', target: 'files', x: 34, y: 246 },
   { label: 'Settings', icon: '⚙️', target: 'settings', x: 34, y: 352 },
   { label: 'Apps', icon: '📦', target: 'launcher', x: 34, y: 458 },
+  { label: 'Chat', icon: '💬', target: 'chat', x: 34, y: 564 },
+  { label: 'Snake', icon: '🐍', target: 'snake', x: 34, y: 670 },
 ];
 
 const fileSystem = {
@@ -15,6 +17,8 @@ const fileSystem = {
 const users = [
   { username: 'Max', password: 'boi', displayName: 'Max' },
   { username: 'monte', password: 'mnttgrsrkn2014!', displayName: 'monte' },
+  { username: 'Teddy', password: 'teddy123', displayName: 'Teddy' },
+  { username: 'emin', password: 'emin123', displayName: 'emin' },
 ];
 
 const appWindows = Array.from(document.querySelectorAll('[data-window]'));
@@ -25,11 +29,24 @@ const desktopShell = document.getElementById('desktopShell');
 const loginForm = document.getElementById('loginForm');
 const loginError = document.getElementById('loginError');
 const signOutButton = document.getElementById('signOutButton');
+const chatMessages = document.getElementById('chatMessages');
+const chatInput = document.getElementById('chatInput');
+const chatTarget = document.getElementById('chatTarget');
+const chatSend = document.getElementById('chatSend');
+const chatUserList = document.getElementById('chatUserList');
+const snakeCanvas = document.getElementById('snakeCanvas');
+const snakeScore = document.getElementById('snakeScore');
+const snakeRestart = document.getElementById('snakeRestart');
 let currentUser = null;
 let zIndex = 100;
+let chatRecipient = 'everyone';
+let snake = null;
 
 const THEME_KEY = 'pisces-theme';
 const DEFAULT_THEME = 'dark';
+const CHAT_KEY = 'pisces-chat';
+const BROADCAST_KEY = 'pisces-chat-sync';
+const snakeChannel = new BroadcastChannel(BROADCAST_KEY);
 
 function getTheme() {
   return localStorage.getItem(THEME_KEY) || DEFAULT_THEME;
@@ -41,6 +58,115 @@ function setTheme(theme) {
   html.classList.remove('theme-dark', 'theme-light', 'theme-neon');
   if (theme !== 'dark') {
     html.classList.add(`theme-${theme}`);
+  }
+}
+
+function getChatMessages() {
+  const stored = localStorage.getItem(CHAT_KEY);
+  if (!stored) {
+    return [
+      {
+        id: crypto.randomUUID(),
+        from: 'system',
+        to: 'everyone',
+        text: 'Welcome to Pisces OS chat.',
+        timestamp: Date.now(),
+      },
+    ];
+  }
+  try {
+    return JSON.parse(stored);
+  } catch {
+    return [];
+  }
+}
+
+function saveChatMessages(messages) {
+  localStorage.setItem(CHAT_KEY, JSON.stringify(messages));
+  snakeChannel.postMessage({ type: 'chat-update', timestamp: Date.now() });
+}
+
+function renderChatUsers() {
+  if (!chatUserList) return;
+  const options = ['everyone', ...users.map((user) => user.username)];
+  const filtered = options.filter((value) => value !== currentUser);
+  chatUserList.innerHTML = '';
+  chatTarget.innerHTML = '<option value="everyone">Everyone</option>';
+
+  filtered.forEach((name) => {
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = 'chat-user-item';
+    item.textContent = name === 'everyone' ? 'Everyone' : name;
+    item.dataset.user = name;
+    if (chatRecipient === name) item.classList.add('active');
+    item.addEventListener('click', () => {
+      chatRecipient = name;
+      chatTarget.value = name;
+      renderChatUsers();
+    });
+    chatUserList.appendChild(item);
+
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = name === 'everyone' ? 'Everyone' : name;
+    chatTarget.appendChild(opt);
+  });
+
+  if (chatRecipient && [...chatTarget.options].some((opt) => opt.value === chatRecipient)) {
+    chatTarget.value = chatRecipient;
+  } else {
+    chatRecipient = 'everyone';
+    chatTarget.value = 'everyone';
+  }
+}
+
+function renderMessages() {
+  if (!chatMessages || !currentUser) return;
+  const messages = getChatMessages();
+  const visible = messages.filter((message) => {
+    const isGroup = message.to === 'everyone';
+    const isDirectToMe = message.to === currentUser;
+    const isFromMe = message.from === currentUser;
+    return isGroup || isDirectToMe || isFromMe;
+  });
+
+  chatMessages.innerHTML = '';
+  visible.forEach((message) => {
+    const div = document.createElement('div');
+    const isSelf = message.from === currentUser;
+    const label = isSelf ? 'You' : message.from;
+    const target = message.to === 'everyone' ? 'everyone' : message.to;
+    div.className = `chat-message ${isSelf ? 'self' : 'other'}`;
+    div.innerHTML = `<small>${label} → ${target} · ${new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>${message.text}`;
+    chatMessages.appendChild(div);
+  });
+
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function sendChatMessage() {
+  if (!currentUser) return;
+  const text = chatInput.value.trim();
+  if (!text) return;
+
+  const messages = getChatMessages();
+  messages.push({
+    id: crypto.randomUUID(),
+    from: currentUser,
+    to: chatRecipient,
+    text,
+    timestamp: Date.now(),
+  });
+
+  saveChatMessages(messages);
+  chatInput.value = '';
+  renderMessages();
+}
+
+function syncChatFromBroadcast(event) {
+  if (event?.data?.type === 'chat-update') {
+    renderMessages();
   }
 }
 
@@ -242,7 +368,8 @@ function signOut() {
   loginError.textContent = '';
   document.getElementById('usernameInput').value = 'Max';
   document.getElementById('passwordInput').value = 'boi';
-  terminalOutput.innerHTML = '';
+  if (terminalOutput) terminalOutput.innerHTML = '';
+  chatInput.value = '';
 }
 
 function enableDesktop(username) {
@@ -253,6 +380,8 @@ function enableDesktop(username) {
     windowNode.style.zIndex = '10';
   });
   openWindow('launcher');
+  renderChatUsers();
+  renderMessages();
   appendTerminalOutput(`Pisces OS ready. Logged in as ${username}. Type "help" for commands.`);
 }
 
@@ -279,6 +408,134 @@ function bindSignOut() {
   signOutButton.addEventListener('click', signOut);
 }
 
+function bindChat() {
+  chatTarget.addEventListener('change', (event) => {
+    chatRecipient = event.target.value;
+    renderChatUsers();
+  });
+
+  chatSend.addEventListener('click', sendChatMessage);
+
+  chatInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      sendChatMessage();
+    }
+  });
+
+  window.addEventListener('storage', (event) => {
+    if (event.key === CHAT_KEY) {
+      renderMessages();
+    }
+  });
+
+  snakeChannel.addEventListener('message', syncChatFromBroadcast);
+}
+
+function setupSnakeGame() {
+  const ctx = snakeCanvas.getContext('2d');
+  const gridSize = 18;
+  const tileCount = snakeCanvas.width / gridSize;
+  let snake = [];
+  let direction = { x: 1, y: 0 };
+  let nextDirection = { x: 1, y: 0 };
+  let food = { x: 0, y: 0 };
+  let score = 0;
+  let gameLoop = null;
+
+  function placeFood() {
+    food = {
+      x: Math.floor(Math.random() * tileCount),
+      y: Math.floor(Math.random() * tileCount),
+    };
+    for (const segment of snake) {
+      if (segment.x === food.x && segment.y === food.y) {
+        placeFood();
+        break;
+      }
+    }
+  }
+
+  function startGame() {
+    snake = [
+      { x: 7, y: 9 },
+      { x: 6, y: 9 },
+      { x: 5, y: 9 },
+    ];
+    direction = { x: 1, y: 0 };
+    nextDirection = { x: 1, y: 0 };
+    score = 0;
+    snakeScore.textContent = String(score);
+    placeFood();
+    draw();
+    clearInterval(gameLoop);
+    gameLoop = setInterval(() => {
+      direction = nextDirection;
+      const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+      const hitWall = head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount;
+      const hitSelf = snake.some((segment) => segment.x === head.x && segment.y === head.y);
+
+      if (hitWall || hitSelf) {
+        clearInterval(gameLoop);
+        alert('Game Over');
+        return;
+      }
+
+      snake.unshift(head);
+      if (head.x === food.x && head.y === food.y) {
+        score += 10;
+        snakeScore.textContent = String(score);
+        placeFood();
+      } else {
+        snake.pop();
+      }
+
+      draw();
+    }, 120);
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+    ctx.fillStyle = '#0d1326';
+    ctx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+
+    for (let i = 0; i < tileCount; i += 1) {
+      for (let j = 0; j < tileCount; j += 1) {
+        ctx.strokeStyle = 'rgba(58, 242, 255, 0.12)';
+        ctx.strokeRect(i * gridSize, j * gridSize, gridSize, gridSize);
+      }
+    }
+
+    ctx.fillStyle = '#39ff14';
+    snake.forEach((segment) => {
+      ctx.fillRect(segment.x * gridSize + 1, segment.y * gridSize + 1, gridSize - 2, gridSize - 2);
+    });
+
+    ctx.fillStyle = '#ff5bc9';
+    ctx.fillRect(food.x * gridSize + 2, food.y * gridSize + 2, gridSize - 4, gridSize - 4);
+  }
+
+  function changeDirection(event) {
+    const map = {
+      ArrowUp: { x: 0, y: -1 },
+      ArrowDown: { x: 0, y: 1 },
+      ArrowLeft: { x: -1, y: 0 },
+      ArrowRight: { x: 1, y: 0 },
+    };
+
+    const newDirection = map[event.key];
+    if (!newDirection) return;
+
+    const isOpposite = newDirection.x === -direction.x && newDirection.y === -direction.y;
+    if (!isOpposite) {
+      nextDirection = newDirection;
+    }
+  }
+
+  document.addEventListener('keydown', changeDirection);
+  snakeRestart.addEventListener('click', startGame);
+  startGame();
+}
+
 window.addEventListener('load', () => {
   const savedTheme = getTheme();
   setTheme(savedTheme);
@@ -292,6 +549,10 @@ window.addEventListener('load', () => {
   bindLogin();
   bindSignOut();
   bindThemeButtons();
+  bindChat();
+  setupSnakeGame();
+  renderChatUsers();
+  renderMessages();
   updateClock();
   setInterval(updateClock, 1000);
 });
